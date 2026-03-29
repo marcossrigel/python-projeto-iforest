@@ -17,4 +17,4 @@ No Isolation Forest ou no IForest
 E uma coluna score onde valores mais baixos geralmente indicam registros mais suspeitos
 
 # Qual a base utilizada ?
-foi uma planilha do google sheets com alguns dados ficticios de obras para analise e validação do treinamento.
+foi uma planilha do google sheets com alguns dados fictícios de obras para analise e validação do treinamento.
