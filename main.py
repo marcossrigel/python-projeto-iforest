@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
@@ -20,16 +19,14 @@ ID_PLANILHA = "1oQgFTTb6MEdZLMJkz-Lb-93MY2DpsYz5M_Lx-Tfqi28"
 creds = ServiceAccountCredentials.from_json_keyfile_name(CAMINHO_CREDENCIAIS, scope)
 client = gspread.authorize(creds)
 
-# abrir planilha pela chave
 planilha = client.open_by_key(ID_PLANILHA)
 sheet = planilha.sheet1
 
-# pegar dados
 dados = sheet.get_all_records()
 df = pd.DataFrame(dados)
 
-print("\nBase carregada:")
-print(df.head())
+# print("\nBase carregada:")
+# print(df.head())
 
 # =========================
 # 2. Selecionar variáveis
@@ -47,7 +44,6 @@ for col in features:
     df[col] = pd.to_numeric(df[col], errors="coerce")
 
 df = df.dropna(subset=features).copy()
-
 X = df[features]
 
 # =========================
@@ -71,19 +67,19 @@ modelo.fit(X_scaled)
 # 5. Fazer predições
 # =========================
 df["predicao"] = modelo.predict(X_scaled)
-df["score_anomalia"] = modelo.decision_function(X_scaled)
+df["score"] = modelo.decision_function(X_scaled)
 df["classificacao"] = df["predicao"].map({1: "Normal", -1: "Anomalia"})
 
-df = df.sort_values(by="score_anomalia").reset_index(drop=True)
+df = df.sort_values(by="score").reset_index(drop=True)
 
 # =========================
 # 6. Mostrar resultados
 # =========================
 print("\nResultado final:")
-print(df[["obra", "classificacao", "score_anomalia"]])
+print(df.to_string(formatters={"score": "{:.2f}".format}))
 
 print("\nSomente anomalias encontradas:")
-print(df[df["classificacao"] == "Anomalia"][["obra", "score_anomalia"]])
+print(df[df["classificacao"] == "Anomalia"][["obra", "score"]])
 
 # =========================
 # 7. Gráfico simples
@@ -107,11 +103,12 @@ plt.ylabel("Valor Executado")
 plt.title("Detecção de Anomalias em Obras com Isolation Forest")
 plt.grid(True)
 
+# =========================
+# 8. Resumo das anomalias
+# =========================
 print("\nResumo das anomalias:")
 
 anomalias = df[df["classificacao"] == "Anomalia"].copy()
-
-# médias e desvios padrão
 medias = df[features].mean()
 desvios = df[features].std()
 
@@ -121,46 +118,21 @@ def interpretar_variavel(col, valor, media, desvio):
 
     z = (valor - media) / desvio
 
-    # só considera anômalo se estiver realmente fora do padrão
-    if abs(z) < 1.5:
+    if abs(z) < 2.0:
         return None
 
-    # regras de texto
     if col == "valor_executado":
-        if z > 0:
-            return "valor_executado muito alto"
-        else:
-            return "valor_executado muito baixo"
-
+        return "valor_executado muito alto" if z > 0 else "valor_executado muito baixo"
     elif col == "valor_orcado":
-        if z > 0:
-            return "valor_orcado acima do padrão"
-        else:
-            return "valor_orcado abaixo do padrão"
-
+        return "valor_orcado acima do padrão" if z > 0 else "valor_orcado abaixo do padrão"
     elif col == "percentual_execucao":
-        if z > 0:
-            return "percentual_execucao muito alto"
-        else:
-            return "percentual_execucao muito baixo"
-
+        return "percentual_execucao muito alto" if z > 0 else "percentual_execucao muito baixo"
     elif col == "atraso_dias":
-        if z > 0:
-            return "atraso_dias muito alto"
-        else:
-            return "atraso_dias abaixo do padrão"
-
+        return "atraso_dias muito alto" if z > 0 else "atraso_dias abaixo do padrão"
     elif col == "aditivos":
-        if z > 0:
-            return "aditivos altos"
-        else:
-            return "aditivos baixos"
-
+        return "aditivos altos" if z > 0 else "aditivos baixos"
     elif col == "pendencias":
-        if z > 0:
-            return "pendencias altas"
-        else:
-            return "pendencias baixas"
+        return "pendencias altas" if z > 0 else "pendencias baixas"
 
     return None
 
@@ -181,6 +153,10 @@ for _, row in anomalias.iterrows():
     else:
         print("- sem variável individual muito destacada; anomalia detectada pelo conjunto")
 
-plt.show()
+# =========================
+# 9. Salvar arquivos
+# =========================
+plt.savefig("grafico_anomalias.png", dpi=300, bbox_inches="tight")
 df.to_csv("resultado_obras.csv", index=False)
 
+plt.show()
