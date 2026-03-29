@@ -30,7 +30,4 @@ para executar, não basta apenas rodar o código, precisa de uma credencial.json
 
 <img width="1200" height="688" alt="Captura de tela 2026-03-29 171710" src="https://github.com/user-attachments/assets/348fdf29-ac8d-4041-8a02-6304cce58adf" />
 
-
 <img width="1003" height="672" alt="Captura de tela 2026-03-29 171900" src="https://github.com/user-attachments/assets/bdebfaa1-ca41-4666-ae29-cf0a5c8fae42" />
-
-
