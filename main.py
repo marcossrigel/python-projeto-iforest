@@ -20,7 +20,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_name(CAMINHO_CREDENCIAIS, sc
 client = gspread.authorize(creds)
 
 planilha = client.open_by_key(ID_PLANILHA)
-sheet = planilha.sheet1
+sheet = planilha.worksheet("sheets1")
 
 dados = sheet.get_all_records()
 df = pd.DataFrame(dados)
