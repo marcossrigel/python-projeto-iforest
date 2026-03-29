@@ -18,3 +18,8 @@ E uma coluna score onde valores mais baixos geralmente indicam registros mais su
 
 # Qual a base utilizada ?
 foi uma planilha do google sheets com alguns dados fictícios de obras para analise e validação do treinamento.
+
+nesse link: https://docs.google.com/spreadsheets/d/1oQgFTTb6MEdZLMJkz-Lb-93MY2DpsYz5M_Lx-Tfqi28/edit?gid=1202364595#gid=1202364595
+
+# Mas atenção 
+para executar não basta apenas rodar o código precisa de uma credencial.json criada pelo google cloud
